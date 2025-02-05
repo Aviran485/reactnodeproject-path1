@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import AiImage from '../images/th.jpg';
 import DogImage from '../images/aavas.jpg';
 import RepImage from '../images/rep.jpeg';
+import ReportList from './ReportList';
+import ReportForm from './ReportForm';
 
 function Home() {
   const articles = [
@@ -29,29 +31,28 @@ function Home() {
     },
   ];
 
-  // STATE FOR DYNAMIC REPORT LIST
+  // STATE FOR REPORTS
   const [reports, setReports] = useState([
     { id: 1, location: "Park A", description: "Small brown dog spotted" },
     { id: 2, location: "Street B", description: "Injured black puppy" },
   ]);
-  const [newReport, setNewReport] = useState({ location: "", description: "" });
+  const [editingReport, setEditingReport] = useState(null);
 
-  // HANDLE INPUT CHANGES
-  const handleChange = (e) => {
-    setNewReport({ ...newReport, [e.target.name]: e.target.value });
+  // ADD NEW REPORT
+  const addReport = (newReport) => {
+    setReports([...reports, { id: reports.length + 1, ...newReport }]);
   };
 
-  // ADD NEW REPORT TO LIST
-  const handleSubmit = () => {
-    if (!newReport.location || !newReport.description) return;
+  // EDIT REPORT
+  const handleEdit = (id) => {
+    const reportToEdit = reports.find((r) => r.id === id);
+    setEditingReport(reportToEdit);
+  };
 
-    const newEntry = {
-      id: reports.length + 1,
-      ...newReport,
-    };
-
-    setReports([...reports, newEntry]);
-    setNewReport({ location: "", description: "" }); // Clear input fields
+  // SAVE EDITED REPORT
+  const saveEditedReport = (updatedReport) => {
+    setReports(reports.map((r) => (r.id === updatedReport.id ? updatedReport : r)));
+    setEditingReport(null);
   };
 
   return (
@@ -59,7 +60,6 @@ function Home() {
       <div className="articles-list">
         {articles.map((article) => (
           <div key={article.id} className="article-card">
-            {/* Make the image clickable */}
             <Link to={article.link}>
               <img src={article.image} alt={article.title} className="article-image" />
             </Link>
@@ -69,36 +69,9 @@ function Home() {
         ))}
       </div>
 
-      {/* 🚀 NEW FEATURE: STRAY DOG REPORTS LIST */}
-      <div className="report-section">
-        <h2>Stray Dog Reports</h2>
-        <ul>
-          {reports.map((report) => (
-            <li key={report.id}>
-              <strong>Location:</strong> {report.location} - <strong>Details:</strong> {report.description}
-            </li>
-          ))}
-        </ul>
-
-        {/* INPUT FORM TO ADD NEW REPORT */}
-        <div className="report-form">
-          <input
-            type="text"
-            name="location"
-            value={newReport.location}
-            onChange={handleChange}
-            placeholder="Enter location"
-          />
-          <input
-            type="text"
-            name="description"
-            value={newReport.description}
-            onChange={handleChange}
-            placeholder="Describe the dog..."
-          />
-          <button onClick={handleSubmit}>Submit Report</button>
-        </div>
-      </div>
+      {/* REPORT MANAGEMENT COMPONENTS */}
+      <ReportList reports={reports} onEdit={handleEdit} />
+      <ReportForm onSubmit={addReport} reportToEdit={editingReport} onSaveEdit={saveEditedReport} />
     </div>
   );
 }
