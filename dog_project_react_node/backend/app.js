@@ -8,18 +8,19 @@ const authRoutes = require("./routes/auth");
 
 const app = express();
 
+// 📌 הגדרות CORS עם תמיכה ב-Session
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000", // מתאים ל-Frontend שלך
     credentials: true,
   })
 );
 
-
+// 📌 תמיכה ב-JSON ובנתונים מטפסים
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+// 📌 הגדרת Session במקום טוקן
 app.use(
   session({
     secret: "supersecretkey",
